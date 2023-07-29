@@ -7,10 +7,8 @@ const ProtectedRoute = () => {
 const { auth } = useContext(AuthContext);
     // const authData = useAuth();
     const location = useLocation();
-    const token = localStorage.getItem('user')
-    console.log('authdata',auth.token);
     return (
-        token
+        auth.accessToken
             ? <Outlet />
             : <Navigate to="/login" state={{ from: location }} replace />
     )

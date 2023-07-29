@@ -2,6 +2,8 @@ body {
   background-color: #141630;
   height: 100vh;
   color: #ffffff;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 #root {
   height: inherit;
@@ -345,7 +347,7 @@ body {
   align-items: center;
 }
 
-.topnavbar-padding {
+.top-navbar-padding {
   padding-bottom: 15px;
 }
 
@@ -363,7 +365,7 @@ body {
   margin-left: 8px;
 }
 
-.bet-wrap {
+.bottom-bet-wrap {
   margin-top: auto;
   margin-bottom: 80px;
 }
@@ -386,8 +388,27 @@ body {
   color: #141630;
   height: 70px;
   padding: 15px 15px 15px 15px;
+  position: relative;
 }
-.leaderboard-wrap ul li.winner {
+
+.leaderboard-wrap ul li:last-child {
+  margin-bottom: 80px;
+}
+
+.leaderboard-wrap ul li:last-child::before {
+  content: "";
+  width: 50%;
+  height: 4px;
+  background-color: #d4d4d4bd;
+  position: absolute;
+  border-radius: 10px;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 88px;
+}
+
+.leaderboard-wrap ul li:nth-child(1) {
   background: rgb(255, 216, 64);
   background: linear-gradient(
     90deg,
@@ -395,7 +416,7 @@ body {
     rgba(255, 237, 123, 1) 100%
   );
 }
-.leaderboard-wrap ul li.silver {
+.leaderboard-wrap ul li:nth-child(2) {
   background: rgb(215, 216, 200);
   background: linear-gradient(
     90deg,
@@ -403,13 +424,17 @@ body {
     rgba(223, 225, 210, 1) 100%
   );
 }
-.leaderboard-wrap ul li.bronze {
+.leaderboard-wrap ul li:nth-child(3) {
   background: rgb(244, 170, 107);
   background: linear-gradient(
     90deg,
     rgba(244, 170, 107, 1) 60%,
     rgba(245, 180, 124, 1) 100%
   );
+}
+.leaderboard-wrap ul li.currect-user {
+  /* background: #e9faf3; */
+  background: #97ffd4;
 }
 
 .leaderboard-name-wrap {
@@ -449,4 +474,8 @@ body {
 .leaderboard-coin-wrap span {
   margin-left: 10px;
   font-weight: 600;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

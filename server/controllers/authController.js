@@ -8,24 +8,26 @@ const authLogin = async (req, res) => {
     const cookies = req.cookies;
     const { userID, name, email, picture } = req.body;
     console.log(req.body);
+    console.log("auth login cookies",cookies);
     try {
         if (!email) {
             return res.sendStatus(400);
         }
-        const foundUser = await User.findOne({ email: req.body.email });
-        let refreshToken = jwt.sign({ username: req.body.name }, process.env.SECURE_KEY, { expiresIn: '1d' })
+        const foundUser = await User.findOne({ email });
+        let refreshToken = jwt.sign({ username: name }, process.env.SECURE_REFRESH_KEY, { expiresIn: '1d' })
         if (!foundUser) {
             try {
                 const newUser = new User({
-                    userID: req.body.userID,
-                    name: req.body.name,
-                    email: req.body.email,
+                    userID,
+                    name,
+                    email,
                     points: 500,
                     picture,
                     refreshToken
                 });
-                let accessToken = jwt.sign({ username: req.body.name }, process.env.SECURE_KEY, { expiresIn: 600 }); // Expires in 10 Min
-                await newUser.save();
+                let accessToken = jwt.sign({ username: name }, process.env.SECURE_ACCESS_KEY, { expiresIn: 600 }); // Expires in 10 Min
+                const newUserSaved = await newUser.save();
+                console.log("newUserSaved",newUserSaved);
 
                 res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
                 res.status(200).json({ accessToken, user: { userID: userID, name: name, email: email, url: picture } });
@@ -56,9 +58,10 @@ const authLogin = async (req, res) => {
                 res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'None', secure: true });
             }
 
-            let accessToken = jwt.sign({ username: req.body.name }, process.env.SECURE_KEY, { expiresIn: 600 });
+            let accessToken = jwt.sign({ username: name }, process.env.SECURE_ACCESS_KEY, { expiresIn: 600 });
             foundUser.refreshToken = [...newRefreshTokenArray, refreshToken];
-            await foundUser.save();
+            const user = await foundUser.save();
+            console.log(user);
 
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
             res.status(200).json({ accessToken, user: { userID: userID, name: name, email: email, url: picture } });

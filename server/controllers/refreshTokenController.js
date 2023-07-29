@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const handleRefreshToken = async (req, res) => {
     const cookies = req.cookies;
+    console.log("auth refresh cookie",cookies);
     if (!cookies?.refreshToken) {
         return res.sendStatus(401);
     }
@@ -16,7 +17,7 @@ const handleRefreshToken = async (req, res) => {
     if (!foundUser) {
         jwt.verify(
             refreshToken,
-            process.env.SECURE_KEY,
+            process.env.SECURE_REFRESH_KEY,
             async (err, decoded) => {
                 // If we have an error we don't need to worry about it because it means the refresh token is expired invalid token
                 if (err) {
@@ -36,20 +37,20 @@ const handleRefreshToken = async (req, res) => {
     // Filtering out the old refresh token and creating a new array without it
     const newRefreshTokenArray = foundUser.refreshToken.filter(refreshTkn => refreshTkn !== refreshToken);
 
-    jwt.verify(refreshToken, process.env.SECURE_KEY, async (err, decoded) => {
+    jwt.verify(refreshToken, process.env.SECURE_REFRESH_KEY, async (err, decoded) => {
         if (err) {
             console.log('expired refresh token')
             foundUser.refreshToken = [...newRefreshTokenArray];
             await foundUser.save();
         }
 
-        if (err || foundUser.username !== decoded.username) {
+        if (err || foundUser.name !== decoded.username) {
             return res.sendStatus(403);
         }
 
         // Refresh token was still valid
-        const accessToken = jwt.sign({}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10s' });
-        const newRefreshToken = jwt.sign({ "username": foundUser.username }, process.env.SECURE_KEY, { expiresIn: '1d' });
+        const accessToken = jwt.sign({}, process.env.SECURE_ACCESS_KEY, { expiresIn: '10s' });
+        const newRefreshToken = jwt.sign({ username: foundUser.name }, process.env.SECURE_REFRESH_KEY, { expiresIn: '1d' });
 
         // Saving refreshToken with current user
         foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];

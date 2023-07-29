@@ -15,13 +15,17 @@ function Login() {
     const from = location.state?.from?.pathname || '/';
 
     const responseFacebook = async (response) => {
+        console.log("response", response);
         const userID = response.userID, name = response.name, email = response.email, picture = response.picture.data.url;
         const authData = { userID, name, email, picture }
-        const responce = await router.post(_loginURL, authData);
-        localStorage.setItem('user', `Bearer ${responce.data.accessToken}`);
-        localStorage.setItem('user-data', JSON.stringify(responce.data));
+        const responce = await router.post(_loginURL, authData, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
+        });
+        // localStorage.setItem('user', `Bearer ${responce.data.accessToken}`);
+        // localStorage.setItem('user-data', JSON.stringify(responce.data));
         setAuth(responce.data);
-        console.log("responce",responce);
+        console.log("responce", responce);
         navigate(from, { replace: true });
     }
     // const handleLogout = () => {
@@ -35,7 +39,7 @@ function Login() {
                     <img src="" alt="" />
                 </div>
                 <FacebookLogin
-                    appId="606457544826084"
+                    appId="2956994187941996"
                     autoLoad={false}
                     fields="name,email,picture"
                     callback={responseFacebook}
